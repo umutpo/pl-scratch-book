@@ -1,1 +1,1 @@
-# pl-scratch-book
+A Scratch Book for Programming Language Learning/Mastering
