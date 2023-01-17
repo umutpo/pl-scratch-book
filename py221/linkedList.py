@@ -4,12 +4,12 @@ class Node:
     """
     Basic Node implementation for Linked List
     """
-    def __init__(self, data, next=None):
-        self.data = data
+    def __init__(self, value, next=None):
+        self.value = value
         self.next = next
     
     def __repr__(self):
-        return "[{0}] -> {1}".format(self.data, self.next)
+        return "[{0}] -> {1}".format(self.value, self.next)
 
 class LinkedList:
     """
@@ -26,7 +26,7 @@ class LinkedList:
         """
         def print_recur(node):
             if node != None:
-                print(node.data, end=", ")
+                print(node.value, end=", ")
                 print_recur(node.next)
 
         print_recur(self.head)
@@ -40,19 +40,19 @@ class LinkedList:
         def print_recur(node):
             if node != None:
                 print_recur(node.next)
-                print(node.data, end=", ")
+                print(node.value, end=", ")
 
         print_recur(self.head)
     
-    def get_node(self, index):
+    def get_value(self, index):
         """
-        Get the node in given index
+        Get the value in given index
         - Time Complexity: O(n)
         - Space Complexity: O(1)
         """
         def get_node_recur(index, node):
             if index == 0:
-                return node
+                return node.value
             elif node != None:
                 return get_node_recur(index - 1, node.next)
             else:
@@ -60,7 +60,7 @@ class LinkedList:
         
         return get_node_recur(index, self.head)
 
-    def get_node(self, data):
+    def get_node(self, value):
         """
         Get the node with the given node
         - Time Complexity: O(n)
@@ -68,17 +68,19 @@ class LinkedList:
         """
         current = self.head
         while current != None:
-            if current.data == data:
+            if current.value == value:
                 return current
         
         return None
 
-    def insert(self, index, node):
+    def insert(self, index, value):
         """
-        Insert the given node in given index
+        Insert the given value in given index
         - Time Complexity: O(n)
         - Space Complexity: O(1)
         """
+        new_node = Node(value)
+
         prev = None
         current = self.head
         while index > 0 and current != None:
@@ -87,19 +89,19 @@ class LinkedList:
             index -= 1
         
         if prev == None:
-            node.next = self.head
-            self.head = node
+            new_node.next = self.head
+            self.head = new_node
         else:
-            node.next = current
-            prev.next = node
+            new_node.next = current
+            prev.next = new_node
 
-    def insert_at_front(self, node):
+    def insert_at_front(self, value):
         """
-        Insert the given node at the front of the list
+        Insert the given value at the front of the list
         - Time Complexity: O(1)
         - Space Complexity: O(1)
         """
-        self.insert(0, node)
+        self.insert(0, value)
     
     def remove(self, index):
         """
@@ -147,13 +149,13 @@ if __name__ == "__main__":
     def create_long_linked_list():
             linked_list = LinkedList()
             for i in range(5, -1, -1):
-                linked_list.insert_at_front(Node(i))
+                linked_list.insert_at_front(i)
             return linked_list
 
     class TestLinkedList(unittest.TestCase):
         def test_node_constructor(self):
             node = Node(2)
-            self.assertEqual(node.data, 2)
+            self.assertEqual(node.value, 2)
             self.assertEqual(node.next, None)
         
         def test_linked_list_constructor(self):
@@ -165,32 +167,31 @@ if __name__ == "__main__":
         def test_linked_list_insert_at_front(self):
             linked_list = create_long_linked_list()
             ptr = linked_list.head
-            ptr_data = 0
+            ptr_value = 0
             while ptr != None:
-                self.assertEqual(ptr.data, ptr_data)
-                ptr_data += 1
+                self.assertEqual(ptr.value, ptr_value)
+                ptr_value += 1
                 ptr = ptr.next
         
         def test_linked_list_insert(self):
             linked_list = create_long_linked_list()
-            new_node = Node(20)
-            linked_list.insert(2, new_node)
-            self.assertEqual(linked_list.get_node(2), new_node)
+            linked_list.insert(2, 20)
+            self.assertEqual(linked_list.get_value(2), 20)
 
         def test_linked_list_remove(self):
             linked_list = create_long_linked_list()
             linked_list.remove(2)
-            self.assertEqual(linked_list.get_node(1).data, 1)
-            self.assertEqual(linked_list.get_node(2).data, 3)
+            self.assertEqual(linked_list.get_value(1), 1)
+            self.assertEqual(linked_list.get_value(2), 3)
         
         def test_linked_list_reverse(self):
             linked_list = create_long_linked_list()
             linked_list.reverse()
             ptr = linked_list.head
-            ptr_data = 5
+            ptr_value = 5
             while ptr != None:
-                self.assertEqual(ptr.data, ptr_data)
-                ptr_data -= 1
+                self.assertEqual(ptr.value, ptr_value)
+                ptr_value -= 1
                 ptr = ptr.next
 
     unittest.main()
