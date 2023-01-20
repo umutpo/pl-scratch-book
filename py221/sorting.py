@@ -1,6 +1,33 @@
 import unittest
 import random
 
+def bubbleSort(array):
+    """
+    Bubble Sort: Every iteration, BUBBLE up the remaining largest element to
+                 end of the array. Basically, divides the array into unsorted and sorted parts
+                 where sorted by accumulates at the end of the list by repeatedly swapping the larger
+                 element from left to right
+    - Time Complexity: O(n^2)
+    - Space Complexity: O(1)
+    """
+    unsorted_length = len(array)
+    swapped = True
+
+    # Continue iterating through the unsorted part until there is no swapping done
+    while swapped:
+        swapped = False
+
+        # Swap each element of the unsorted part with the next one if it is larger
+        for i in range(1, unsorted_length):
+            if array[i - 1] > array[i]:
+                array[i - 1], array[i] = array[i], array[i - 1]
+                swapped = True
+
+        # Each iteration, the sorted part at the end of the array grows by 1
+        unsorted_length -= 1
+
+    return array
+
 def selectionSort(array):
     """
     Selection Sort: Every iteration, SELECT the smallest element in rest of the 
@@ -18,7 +45,7 @@ def selectionSort(array):
             if array[j] < array[current_min_index]:
                 current_min_index = j
         
-        # Swap the smallest element with the current element
+        # Swap the smallest element in the unsorted part with the current element
         array[current_min_index], array[i] = array[i], array[current_min_index]
     
     return array
@@ -35,13 +62,13 @@ def insertionSort(array):
     for i in range(1, len(array)):
         current_element = array[i]
         
-        # Shuffle up all sorted items > array[i]
+        # Shuffle up each element in the sorted part that are larger than array[i]
         j = i
         while j > 0 and array[j - 1] > current_element:
             array[j] = array[j - 1]
             j -= 1
         
-        # Insert the current element
+        # Insert the current element in the sorted part
         array[j] = current_element
     
     return array
@@ -95,10 +122,12 @@ def quickSort(array):
     - Space Complexity: O(1)
     """
     def partition(array, low, high):
+
         # Choose the rightmost element as pivot
         pivot = array[high]
         
-        # Compare each element to pivot and swap their location
+        # Compare each element to the pivot and swap their location with the current index
+        # which holds the mark for elements smaller than pivot
         current_index = low - 1
         for i in range(low, high):
             if array[i] <= pivot:
@@ -126,8 +155,9 @@ def quickSort(array):
     return _quickSort(array, 0, len(array) - 1)
 
 if __name__ == "__main__":
+    sorting_algorithms = [bubbleSort, selectionSort, insertionSort, mergeSort, quickSort]
+
     def testAllAlgorithms(assertEqualFunc, unsorted_array, sorted_array):
-        sorting_algorithms = [selectionSort, insertionSort, mergeSort, quickSort]
         for i in range(len(sorting_algorithms)):
                 assertEqualFunc(sorting_algorithms[i](unsorted_array[:]), sorted_array)
 
