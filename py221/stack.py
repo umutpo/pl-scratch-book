@@ -1,5 +1,15 @@
 import unittest
-from linkedList import Node
+
+class Node:
+    """
+    Basic Node implementation for Linked List
+    """
+    def __init__(self, value, next=None):
+        self.value = value
+        self.next = next
+    
+    def __repr__(self):
+        return "[{0}] -> {1}".format(self.value, self.next)
 
 class Stack:
     def __init__(self):

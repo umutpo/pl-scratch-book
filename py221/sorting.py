@@ -1,7 +1,7 @@
 import unittest
 import random
 
-def bubbleSort(array):
+def bubble_sort(array):
     """
     Bubble Sort: Every iteration, BUBBLE up the remaining largest element to
                  end of the array. Basically, divides the array into unsorted and sorted parts
@@ -28,7 +28,7 @@ def bubbleSort(array):
 
     return array
 
-def selectionSort(array):
+def selection_sort(array):
     """
     Selection Sort: Every iteration, SELECT the smallest element in rest of the 
                     array and swap it with the current element. Basically, divides
@@ -50,7 +50,7 @@ def selectionSort(array):
     
     return array
 
-def insertionSort(array):
+def insertion_sort(array):
     """
     Insertion Sort: Every iteration, slide the previous elements that are greater to 
                     the right and INSERT the current element in the opened gap. Basically,
@@ -73,7 +73,7 @@ def insertionSort(array):
     
     return array
 
-def mergeSort(array):
+def merge_sort(array):
     """
     Merge Sort: Divide the array in half recursively until each subarray has one element left, 
                 then MERGE the sorted left half and the sorted right half. Basically,
@@ -85,10 +85,10 @@ def mergeSort(array):
         middle = len(array) // 2
         
         # Sort the left half
-        left_array = mergeSort(array[:middle])
+        left_array = merge_sort(array[:middle])
         
         # Sort the right half
-        right_array = mergeSort(array[middle:])
+        right_array = merge_sort(array[middle:])
 
         # Merge the sorted left and right halves
         left, right, main = 0, 0, 0
@@ -113,7 +113,7 @@ def mergeSort(array):
         
     return array
 
-def quickSort(array):
+def quick_sort(array):
     """
     Quick Sort: Choose a random pivot and put all the smaller elements to its left
                 and all the larger elements to its right, then recursively do the same
@@ -139,41 +139,41 @@ def quickSort(array):
 
         return current_index + 1
     
-    def _quickSort(array, low, high):
+    def _quick_sort(array, low, high):
         if low < high:
             # Find the pivot and put the smaller/larger elements to its left/right
             pivot = partition(array, low, high)
 
             # Sort the left subarray of the pivot
-            _quickSort(array, low, pivot - 1)
+            _quick_sort(array, low, pivot - 1)
 
             # Sort the right subarray of the pivot
-            _quickSort(array, pivot + 1, high)
+            _quick_sort(array, pivot + 1, high)
 
         return array
     
-    return _quickSort(array, 0, len(array) - 1)
+    return _quick_sort(array, 0, len(array) - 1)
 
 if __name__ == "__main__":
-    sorting_algorithms = [bubbleSort, selectionSort, insertionSort, mergeSort, quickSort]
+    sorting_algorithms = [bubble_sort, selection_sort, insertion_sort, merge_sort, quick_sort]
 
-    def testAllAlgorithms(assertEqualFunc, unsorted_array, sorted_array):
+    def test_all_algorithms(assertEqualFunc, unsorted_array, sorted_array):
         for i in range(len(sorting_algorithms)):
                 assertEqualFunc(sorting_algorithms[i](unsorted_array[:]), sorted_array)
 
     class TestSorting(unittest.TestCase):
         def test_sort_empty_array(self):
             empty_array = []
-            testAllAlgorithms(self.assertEqual, empty_array, empty_array)
+            test_all_algorithms(self.assertEqual, empty_array, empty_array)
 
         def test_sort_array(self):
             array = [5, 3, 2, 4, 1]
             sorted_array = [1, 2, 3, 4, 5]
-            testAllAlgorithms(self.assertEqual, array, sorted_array)
+            test_all_algorithms(self.assertEqual, array, sorted_array)
         
         def test_sort_random_array(self):
             random_array = random.sample(range(0, 100), 50)
             sorted_array = sorted(random_array)
-            testAllAlgorithms(self.assertEqual, random_array, sorted_array)
+            test_all_algorithms(self.assertEqual, random_array, sorted_array)
     
     unittest.main()
