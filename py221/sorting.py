@@ -1,6 +1,8 @@
 import unittest
 import random
 
+from heap import MinBinaryHeap
+
 def bubble_sort(array):
     """
     Bubble Sort: Every iteration, BUBBLE up the remaining largest element to
@@ -154,8 +156,19 @@ def quick_sort(array):
     
     return _quick_sort(array, 0, len(array) - 1)
 
+def heap_sort(array):
+    """
+    Heap Sort: Build a minimum binary heap and repeatedly remove the minimum element
+    - Time Complexity: O(nlogn)
+    - Space Complexity: O(1)
+    """
+    heap = MinBinaryHeap(array)
+    for i in range(len(array)):
+        array[i] = heap.remove_min()
+    return array
+
 if __name__ == "__main__":
-    sorting_algorithms = [bubble_sort, selection_sort, insertion_sort, merge_sort, quick_sort]
+    sorting_algorithms = [bubble_sort, selection_sort, insertion_sort, merge_sort, quick_sort, heap_sort]
 
     def test_all_algorithms(assertEqualFunc, unsorted_array, sorted_array):
         for i in range(len(sorting_algorithms)):
