@@ -96,8 +96,6 @@ def DFS_iterative(graph, value):
     - Space Complexity: O(n) where n is the number of vertices
     """
     def depth_first_search_iterative(vertex):
-        graph.reset_visited()
-
         stack = [vertex]
         while len(stack) > 0:
             current_vertex = stack.pop()
