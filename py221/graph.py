@@ -187,16 +187,6 @@ def Dijkstra(graph, source):
                        Note that the current implementation does not use a priority queue, therefore O(n^2)
     - Space Complexity: O(n) where n is the number of vertices
     """
-    def get_closest_unvisited_node(unvisited_vertices, distances):
-        current_min_vertex = None
-        current_min_distance = sys.maxsize
-        for vertex in unvisited_vertices:
-            if distances[vertex] < current_min_distance:
-                current_min_distance = distances[vertex]
-                current_min_vertex = vertex
-
-        return current_min_vertex
-
     # Mark all vertices as unvisited
     graph.reset_visited()
 
@@ -208,8 +198,8 @@ def Dijkstra(graph, source):
     distances[source] = 0
 
     while len(unvisited_vertices) > 0:
-        # Set the unvisited node with the minimum distance to current vertex
-        current_vertex = get_closest_unvisited_node(unvisited_vertices, distances)
+        # Set the current vertex to the unvisited node with the minimum distance
+        current_vertex = min(unvisited_vertices, key=lambda vertex : distances[vertex])
 
         # Mark the current vertex as visited and remove it from the unvisited vertices set
         current_vertex.visited = True
