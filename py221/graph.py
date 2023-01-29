@@ -1,4 +1,14 @@
 import unittest
+import sys
+import heap
+
+class Vertex:
+    """
+    Simple Vertex Implementation for Graphs
+    """
+    def __init__(self, value):
+        self.value = value
+        self.visited = False
 
 class Edge:
     """
@@ -9,23 +19,15 @@ class Edge:
         self.end = end
         self.weight = weight
 
-class Vertex:
+class Graph:
     """
-    Simple Vertex Implementation for Graphs
-    """
-    def __init__(self, value):
-        self.value = value
-        self.visited = False
-
-class DirectedGraph:
-    """
-    Directed Graph implementation using Adjacency List with utility functions
+    Graph implementation using Adjacency List with utility functions
     """
     def __init__(self):
         self.al = {}
 
     def get_vertices(self):
-        return self.al.keys()
+        return list(self.al.keys())
     
     def get_vertex_edges(self, vertex):
         return self.al[vertex]
@@ -37,7 +39,20 @@ class DirectedGraph:
     def add_vertex(self, vertex):
         if vertex not in self.al:
             self.al[vertex] = []
-    
+
+class UndirectedGraph(Graph):
+    """
+    Undirected Graph implementation using Adjacency List with utility functions
+    """
+    def add_edge(self, edge):
+        if edge.beginning in self.al and edge.end in self.al:
+            self.al[edge.beginning].append(edge)
+            self.al[edge.end].append(Edge(edge.end, edge.beginning, edge.weight))
+
+class DirectedGraph(Graph):
+    """
+    Directed Graph implementation using Adjacency List with utility functions
+    """    
     def add_edge(self, edge):
         if edge.beginning in self.al:
             self.al[edge.beginning].append(edge)
@@ -54,14 +69,14 @@ def BFS(graph, value):
         queue = [vertex]
         while len(queue) > 0:
             current_vertex = queue.pop()
-            
+
             if current_vertex.value == value:
                 return current_vertex
 
-            for adjacent_vertex in graph.get_vertex_edges(current_vertex):
-                if not adjacent_vertex.end.visited:
-                    queue.insert(0, adjacent_vertex.end)
-                    adjacent_vertex.end.visited = True
+            for edge in graph.get_vertex_edges(current_vertex):
+                if not edge.end.visited:
+                    queue.insert(0, edge.end)
+                    edge.end.visited = True
         
         return None
 
@@ -92,8 +107,8 @@ def DFS_iterative(graph, value):
                 if current_vertex.value == value:
                     return current_vertex
 
-                for adjacent_vertex in graph.get_vertex_edges(current_vertex):
-                    stack.append(adjacent_vertex.end)
+                for edge in graph.get_vertex_edges(current_vertex):
+                    stack.append(edge.end)
         
         return None
     
@@ -118,9 +133,9 @@ def DFS_recursive(graph, value):
         if vertex.value == value:
             return vertex
             
-        for adjacent_vertex in graph.get_vertex_edges(vertex):
-            if not adjacent_vertex.end.visited:
-                found = depth_first_search_recursive(adjacent_vertex.end)
+        for edge in graph.get_vertex_edges(vertex):
+            if not edge.end.visited:
+                found = depth_first_search_recursive(edge.end)
                 if found != None:
                     return found
 
@@ -135,8 +150,83 @@ def DFS_recursive(graph, value):
         
     return None
 
+def Kruskal(graph):
+    """
+    Kruskal's algorithm to find the minimum spanning forest in a weighted, undirected graph
+    - Time Complexity: O(mlogm) where m is the number of edges
+    - Space Complexity: O(n) where n is the number of vertices
+    """
+    def union(set, x, y):
+        set[x] = y
+        
+    def find(set, x):
+        # Using path compression by reassigning each parent
+        if set[x] != x:
+            set[x] = find(set, set[x])
+        return set[x]
+        
+    spanning_tree = []
+    vertex_sets = list(map(lambda vertex : vertex.value, graph.get_vertices()))
+
+    # Iterate over a list of edges, sorted by their weight
+    edges = sorted(set([edge for vertex in graph.get_vertices() for edge in graph.get_vertex_edges(vertex)]), key=lambda edge : edge.weight)
+    for edge in edges:
+        # If the edge does not create a cycle, add it to the spanning tree and mark vertices as connected
+        if find(vertex_sets, edge.beginning.value) != find(vertex_sets, edge.end.value):
+            spanning_tree.append((edge.beginning.value, edge.end.value))
+            union(vertex_sets, edge.beginning.value, edge.end.value)
+        
+        # Stop when the total number of edges in spanning tree is V - 1
+        if len(spanning_tree) + 1 == len(vertex_sets):
+            break
+
+    return spanning_tree
+
+def Dijkstra(graph, source):
+    """
+    Dijkstra's algorithm to find the shortest path from the source node to all other nodes in a weighted graph
+    - Time Complexity: O(nlogn + mlogn) where n is the number of vertices and m is the number of edges
+                       Note that the current implementation does not use a priority queue, therefore O(n^2)
+    - Space Complexity: O(n) where n is the number of vertices
+    """
+    def get_closest_unvisited_node(unvisited_vertices, distances):
+        current_min_vertex = None
+        current_min_distance = sys.maxsize
+        for vertex in unvisited_vertices:
+            if distances[vertex] < current_min_distance:
+                current_min_distance = distances[vertex]
+                current_min_vertex = vertex
+
+        return current_min_vertex
+
+    # Mark all vertices as unvisited
+    graph.reset_visited()
+
+    # Create a set of unvisited vertices
+    unvisited_vertices = graph.get_vertices()
+
+    # Create a list of distances from the source node to a specific node with initial value = +inf
+    distances = dict.fromkeys(unvisited_vertices, sys.maxsize)
+    distances[source] = 0
+
+    current_vertex = source
+    while len(unvisited_vertices) > 0:
+        # For the current vertex, visit all of its unvisited neighbours and update their distance
+        for edge in graph.get_vertex_edges(current_vertex):
+            if not edge.end.visited and distances[current_vertex] + edge.weight < distances[edge.end]:
+                distances[edge.end] = distances[current_vertex] + edge.weight
+        
+        # Remove the current vertex from unvisited vertices set
+        current_vertex.visited = True
+        unvisited_vertices.remove(current_vertex)
+
+        # Set the unvisited node with the minimum distance to current vertex
+        current_vertex = get_closest_unvisited_node(unvisited_vertices, distances)
+
+    return distances
+
 if __name__ == "__main__":
-    def get_test_unweighted_graph():
+    def get_test_unweighted_directed_graph():
         graph = DirectedGraph()
         a = Vertex('A')
         b = Vertex('B')
@@ -152,21 +242,68 @@ if __name__ == "__main__":
         graph.add_edge(Edge(a, c))
         graph.add_edge(Edge(b, c))
         graph.add_edge(Edge(b, e))
-        graph.add_edge(Edge(b, d))
         graph.add_edge(Edge(c, e))
         graph.add_edge(Edge(d, e))
         graph.add_edge(Edge(e, c))
         graph.add_edge(Edge(e, a))
         return graph
+    
+    def get_test_weighted_undirected_graph():
+        graph = UndirectedGraph()
+        a = Vertex(0)
+        b = Vertex(1)
+        c = Vertex(2)
+        d = Vertex(3)
+        e = Vertex(4)
+        graph.add_vertex(a)
+        graph.add_vertex(b)
+        graph.add_vertex(c)
+        graph.add_vertex(d)
+        graph.add_vertex(e)
+        graph.add_edge(Edge(a, b, 3))
+        graph.add_edge(Edge(a, c, 6))
+        graph.add_edge(Edge(b, c, 7))
+        graph.add_edge(Edge(b, e, 8))
+        graph.add_edge(Edge(c, d, 2))
+        graph.add_edge(Edge(c, e, 1))
+        graph.add_edge(Edge(d, e, 11))
+        graph.add_edge(Edge(e, a, 5))
+        return graph
 
     class TestGraph(unittest.TestCase):
-        def test_all(self):
+        def test_unweighted_directed_grap_all(self):
             search_algorithms = [BFS, DFS_iterative, DFS_recursive]
-            graph = get_test_unweighted_graph()
+            graph = get_test_unweighted_directed_graph()
             for algorithm in search_algorithms:
                 find_z = algorithm(graph, 'Z')
                 self.assertEqual(find_z, None)
                 find_e = algorithm(graph, 'E')
                 self.assertEqual(find_e.value, 'E')
+        
+        def test_kruskals(self):
+            graph = get_test_weighted_undirected_graph()
+            self.assertEqual(Kruskal(graph), [(2, 4), (2, 3), (0, 1), (4, 0)])
+
+        def test_dijkstra(self):
+            graph = UndirectedGraph()
+            a = Vertex('A')
+            b = Vertex('B')
+            c = Vertex('C')
+            d = Vertex('D')
+            e = Vertex('E')
+            graph.add_vertex(a)
+            graph.add_vertex(b)
+            graph.add_vertex(c)
+            graph.add_vertex(d)
+            graph.add_vertex(e)
+            graph.add_edge(Edge(a, b, 3))
+            graph.add_edge(Edge(a, c, 6))
+            graph.add_edge(Edge(b, c, 7))
+            graph.add_edge(Edge(b, e, 8))
+            graph.add_edge(Edge(c, d, 2))
+            graph.add_edge(Edge(c, e, 1))
+            graph.add_edge(Edge(d, e, 11))
+            graph.add_edge(Edge(e, a, 5))
+            self.assertEqual(Dijkstra(graph, a), { a: 0, b: 3, c: 6, d: 8, e: 5 })
         
     unittest.main()
