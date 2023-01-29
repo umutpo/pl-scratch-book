@@ -209,19 +209,18 @@ def Dijkstra(graph, source):
     distances = dict.fromkeys(unvisited_vertices, sys.maxsize)
     distances[source] = 0
 
-    current_vertex = source
     while len(unvisited_vertices) > 0:
+        # Set the unvisited node with the minimum distance to current vertex
+        current_vertex = get_closest_unvisited_node(unvisited_vertices, distances)
+
+        # Mark the current vertex as visited and remove it from the unvisited vertices set
+        current_vertex.visited = True
+        unvisited_vertices.remove(current_vertex)
+
         # For the current vertex, visit all of its unvisited neighbours and update their distance
         for edge in graph.get_vertex_edges(current_vertex):
             if not edge.end.visited and distances[current_vertex] + edge.weight < distances[edge.end]:
                 distances[edge.end] = distances[current_vertex] + edge.weight
-        
-        # Remove the current vertex from unvisited vertices set
-        current_vertex.visited = True
-        unvisited_vertices.remove(current_vertex)
-
-        # Set the unvisited node with the minimum distance to current vertex
-        current_vertex = get_closest_unvisited_node(unvisited_vertices, distances)
 
     return distances
 
