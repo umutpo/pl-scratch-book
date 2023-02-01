@@ -9,6 +9,7 @@ class Vertex:
     def __init__(self, value):
         self.value = value
         self.visited = False
+        self.inDegree = 0
 
 class Edge:
     """
@@ -47,7 +48,10 @@ class UndirectedGraph(Graph):
     def add_edge(self, edge):
         if edge.beginning in self.al and edge.end in self.al:
             self.al[edge.beginning].append(edge)
+            edge.beginning.inDegree += 1
+
             self.al[edge.end].append(Edge(edge.end, edge.beginning, edge.weight))
+            edge.end.inDegree += 1
 
 class DirectedGraph(Graph):
     """
@@ -56,6 +60,12 @@ class DirectedGraph(Graph):
     def add_edge(self, edge):
         if edge.beginning in self.al:
             self.al[edge.beginning].append(edge)
+            edge.end.inDegree += 1
+    
+    def remove_edge(self, edge):
+        if edge.beginning in self.al:
+            self.al[edge.beginning].remove(edge)
+            edge.end.inDegree -= 1
 
 def BFS(graph, value):
     """
@@ -212,6 +222,37 @@ def Dijkstra(graph, source):
 
     return distances
 
+def Kahn(graph):
+    """
+    Kahn's algorithm finds the topological sort of a Directed Acyclic Graph. If there is no such sort, then the
+    graph has a cycle
+    - Time Complexity: O(m + n): where m is the number of edges and n is the number of vertices
+    - Space Complexity: O(n) where n is the number of vertices
+    """
+    # Topological sort of vertices
+    sorted_vertices = []
+
+    # Find a set of vertices with initially no incoming edge
+    independent_vertices = set()
+    for vertex in graph.get_vertices():
+        if vertex.inDegree == 0:
+            independent_vertices.add(vertex)
+    
+    while len(independent_vertices) > 0:
+        # Get a random vertex from the vertex set with no incoming edges and add it to the sort
+        current_vertex = independent_vertices.pop()
+        sorted_vertices.append(current_vertex)
+
+        # Remove each outbound edge of this vertex. If a vertex has no incoming edge afterwards, add it to the set
+        edges = graph.get_vertex_edges(current_vertex)[:]
+        for edge in edges:
+            graph.remove_edge(edge)
+            if edge.end.inDegree == 0:
+                independent_vertices.add(edge.end)
+    
+    return sorted_vertices
+
+
 if __name__ == "__main__":
     def get_test_unweighted_directed_graph():
         graph = DirectedGraph()
@@ -292,5 +333,28 @@ if __name__ == "__main__":
             graph.add_edge(Edge(d, e, 11))
             graph.add_edge(Edge(e, a, 5))
             self.assertEqual(Dijkstra(graph, a), { a: 0, b: 3, c: 6, d: 8, e: 5 })
+        
+        def test_kahn(self):
+            graph = DirectedGraph()
+            a = Vertex('A')
+            b = Vertex('B')
+            c = Vertex('C')
+            d = Vertex('D')
+            e = Vertex('E')
+            graph.add_vertex(a)
+            graph.add_vertex(b)
+            graph.add_vertex(c)
+            graph.add_vertex(d)
+            graph.add_vertex(e)
+            graph.add_edge(Edge(a, b))
+            graph.add_edge(Edge(a, c))
+            graph.add_edge(Edge(b, c))
+            graph.add_edge(Edge(b, e))
+            graph.add_edge(Edge(c, d))
+            graph.add_edge(Edge(c, e))
+            graph.add_edge(Edge(d, e))
+            topological_sort = list(map(lambda vertex : vertex.value, Kahn(graph)))
+            self.assertEqual(topological_sort, ['A', 'B', 'C', 'D', 'E'])
+
         
     unittest.main()
