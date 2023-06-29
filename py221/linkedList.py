@@ -51,12 +51,12 @@ class LinkedList:
         - Space Complexity: O(1)
         """
         def get_node_recur(index, node):
-            if index == 0:
-                return node.value
-            elif node != None:
-                return get_node_recur(index - 1, node.next)
-            else:
+            if node == None:
                 return None
+            elif index == 0:
+                return node.value                
+            else:
+                return get_node_recur(index - 1, node.next)
         
         return get_node_recur(index, self.head)
 
@@ -70,6 +70,7 @@ class LinkedList:
         while current != None:
             if current.value == value:
                 return current
+            current = current.next
         
         return None
 
